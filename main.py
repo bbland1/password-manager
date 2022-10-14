@@ -1,22 +1,27 @@
-from tkinter import END, BooleanVar, Button, Canvas, Checkbutton, Entry, Label, Tk, PhotoImage, messagebox
+from tkinter import END, HORIZONTAL, BooleanVar, Button, Canvas, Checkbutton, Entry, IntVar, Label, Scale, Tk, PhotoImage, messagebox
 from random import choice, randint, shuffle
 import pyperclip
 import json
 
-LETTERS = "a b c d e f g h i j k l m n o p q r s t u v w x y z A B C D E F G H I J K L M N O P Q R S T U V W X Y Z".split()
+LETTERS_LO = "a b c d e f g h i j k l m n o p q r s t u v w x y z".split()
+LETTERS_UP = "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z".split()
 NUMBERS = "0 1 2 3 4 5 6 7 8 9".split()
-SYMBOLS = "! ? @ # : & * % $ ^".split()
+SYMBOLS = "! ? @ # & * % $ ^".split()
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 
 
 def password_generation():
     password_entry.delete(0, END)
 
-    password_letters = [choice(LETTERS) for _ in range(randint(8, 10))]
-    password_numbers = [choice(NUMBERS) for _ in range(randint(8, 10))]
-    password_symbols = [choice(SYMBOLS) for _ in range(randint(8, 10))]
+    password_letters_lo = [choice(LETTERS_LO)
+                           for _ in range(randint(4, 6))]
+    password_letters_up = [choice(LETTERS_UP)
+                           for _ in range(randint(4, 6))]
+    password_numbers = [choice(NUMBERS) for _ in range(randint(2, 4))]
+    password_symbols = [choice(SYMBOLS) for _ in range(randint(2, 4))]
 
-    password_values = password_letters + password_numbers + password_symbols
+    password_values = password_letters_lo + \
+        password_letters_up + password_numbers + password_symbols
 
     shuffle(password_values)
 
@@ -37,7 +42,7 @@ def view_password():
 
 # ---------------------------- SAVE PASSWORD ------------------------------- #
 def save_info():
-    website = web_entry.get()
+    website = web_entry.get().capitalize()
     name = name_entry.get()
     password = password_entry.get()
 
@@ -53,10 +58,10 @@ def save_info():
                             detail="Don't leave any fields empty!")
 
     else:
-        complete_save = messagebox.askokcancel(
-            message=website, detail=f"Info to be saved: \nEmail/Username: {name} \nPassword: {password}")
+        # complete_save = messagebox.askokcancel(
+        #     message=f"For website: {website}", detail=f"Info to be saved: \nEmail/Username: {name} \nPassword: {password}")
 
-        if complete_save:
+        # if complete_save:
             try:
                 with open("data.json", "r") as data_file:
                     # Read the data found
@@ -75,8 +80,20 @@ def save_info():
                 web_entry.delete(0, END)
                 password_entry.delete(0, END)
 
+# ---------------------------- FIND PASSWORD ------------------------------- #
 
-# ---------------------------- UI SETUP ------------------------------- #
+
+def find_password():
+    website = web_entry.get().capitalize()
+
+    with open("data.json") as data_file:
+        data = json.load(data_file)
+
+        if website in data:
+            email = data[website]
+
+            # ---------------------------- UI SETUP ------------------------------- #
+
 
 window = Tk()
 window.title("Password Manager")
@@ -84,7 +101,7 @@ window.config(padx=50, pady=50)
 
 bg_photo = PhotoImage(file="logo.png")
 canvas = Canvas(width=200, height=200)
-canvas.create_image(135, 100, image=bg_photo)
+canvas.create_image(105, 100, image=bg_photo)
 canvas.grid(column=1, row=0)
 
 # labels
@@ -115,7 +132,7 @@ web_entry.focus()
 password_button_gen = Button(
     text="Generate Password", width=35, command=password_generation)
 password_button_add = Button(text="Add", width=35, command=save_info)
-search_button = Button(text="Search")
+search_button = Button(text="Search", command=find_password)
 
 show_password_value = BooleanVar(value=True)
 show_password = Checkbutton(text="Show", onvalue=False, offvalue=True,
