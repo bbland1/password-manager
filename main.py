@@ -2,7 +2,8 @@ from tkinter import Button, Canvas, Entry, Label, Tk, PhotoImage
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 
 # ---------------------------- SAVE PASSWORD ------------------------------- #
-with open("passwords.txt") as
+with open("passwords.txt", mode="w") as saved_passwords:
+    saved_passwords.write()
 
 # ---------------------------- UI SETUP ------------------------------- #
 
