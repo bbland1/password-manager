@@ -1,4 +1,4 @@
-from tkinter import END, HORIZONTAL, BooleanVar, Button, Canvas, Checkbutton, Entry, IntVar, Label, Scale, Tk, PhotoImage, messagebox
+from tkinter import END, BooleanVar, Button, Canvas, Checkbutton, Entry, Label, Tk, PhotoImage, messagebox
 from random import choice, randint, shuffle
 import pyperclip
 import json
@@ -11,8 +11,10 @@ SYMBOLS = "! ? @ # & * % $ ^".split()
 
 
 def password_generation():
+    # removes any previous password from the field
     password_entry.delete(0, END)
 
+    # list comprehension to randomly generate upper/lower letter, numbers and symbols
     password_letters_lo = [choice(LETTERS_LO)
                            for _ in range(randint(4, 6))]
     password_letters_up = [choice(LETTERS_UP)
@@ -20,13 +22,13 @@ def password_generation():
     password_numbers = [choice(NUMBERS) for _ in range(randint(2, 4))]
     password_symbols = [choice(SYMBOLS) for _ in range(randint(2, 4))]
 
+    # combining the 4 lists into one & shuffling the characters up
     password_values = password_letters_lo + \
         password_letters_up + password_numbers + password_symbols
-
     shuffle(password_values)
 
+    # making a string of the list of characters & inserting it into the field & auto copying to the clipboard
     generated_password = "".join(password_values)
-
     password_entry.insert(0, generated_password)
     pyperclip.copy(generated_password)
 
@@ -34,6 +36,7 @@ def password_generation():
 
 
 def view_password():
+    # the function that will allow the checkbox to switch the password field from showing * or the actual characters
     if show_password_value.get():
         password_entry.config(show="*")
     else:
@@ -42,43 +45,82 @@ def view_password():
 
 # ---------------------------- SAVE PASSWORD ------------------------------- #
 def save_info():
+    # getting the input values from the entry fields
+    # capitalizing the website so it si always the same
     website = web_entry.get().capitalize()
     name = name_entry.get()
     password = password_entry.get()
 
+    # basically the new data schema
     new_data = {
-        website: {
-            "email": name,
-            "password": password
-        }
+        website: [
+            {
+                "email": name,
+                "password": password
+            }
+        ]
     }
 
+    # 
     if website.strip() == "" or password == " ":
-        messagebox.showinfo(message="Whoops!",
+        messagebox.showinfo(title="Empty Field", message="Whoops!",
                             detail="Don't leave any fields empty!")
-
     else:
-        # complete_save = messagebox.askokcancel(
-        #     message=f"For website: {website}", detail=f"Info to be saved: \nEmail/Username: {name} \nPassword: {password}")
+        try:
+            # try to open the json file as read and load
+            with open("data.json", "r") as data_file:
+                # Read the data found
+                data = json.load(data_file)
+        except FileNotFoundError:
+            # if file now found it will dump the info put into a file it creates
+            with open("data.json", "w") as data_file:
+                json.dump(new_data, data_file, indent=4)
+        else:
+            # Update the data with the new stuff
+            data.update(new_data)
 
-        # if complete_save:
-            try:
-                with open("data.json", "r") as data_file:
-                    # Read the data found
-                    data = json.load(data_file)
-            except FileNotFoundError:
-                with open("data.json", "w") as data_file:
-                    json.dump(new_data, data_file, indent=4)
-            else:
-                # Update the data with the new stuff
-                data.update(new_data)
+            # open with read and ability to append the file at the same time
+            with open("data.json", "r+") as data_file:
+                # read the current data in the file
+                current_data = json.load(data_file)
 
-                with open("data.json", "w") as data_file:
-                    # Save the new data
-                    json.dump(data, data_file, indent=4)
-            finally:
-                web_entry.delete(0, END)
-                password_entry.delete(0, END)
+                # searches for the website inputted within the file
+                if website in current_data:
+                    # check if within the website found to see if the email used is already stored in the list stored info
+                    if not any(emails["email"] == name for emails in current_data[website]):
+                        # if the email isn't found at all the current data is appended and added to the list for the emails 
+                        current_data[website].append(
+                            {"email": data[website][0]["email"], "password": data[website][0]["password"]})
+                        data_file.seek(0)
+                        json.dump(current_data, data_file, indent=4)
+                    else:
+                        # if the email is found in the list of already saved items of the website the popup message will show to confirm overwrite or cancel to stop
+                        overwrite = messagebox.askyesno(
+                            title="Overwrite", message=f"Info was already saved for {website} and {name}", detail=f"Would you like to update it?\n Yes: overwrite the current password\n No: cancel the save and clear the inputs to try again")
+
+                        if overwrite == True:
+                            # find where in the list of info for that website the data is stored
+                            stored_location_find = [index for (index, item) in enumerate(
+                                current_data[website]) if item["email"] == name]
+
+                            # change that stored location list to an integer
+                            stored_location = int(
+                                "".join(map(str, stored_location_find)))
+
+                            # change the password of the specific info
+                            current_data[website][stored_location]["password"] = password
+
+                            with open("data.json", "w") as data_file:
+                                json.dump(current_data, data_file, indent=4)
+                else:
+                    # when the website isn't already found just add to the file
+                    with open("data.json", "w") as data_file:
+                        # Save the new data
+                        json.dump(data, data_file, indent=4)
+        finally:
+            # clear the input fields after saving or canceling the save
+            web_entry.delete(0, END)
+            password_entry.delete(0, END)
 
 # ---------------------------- FIND PASSWORD ------------------------------- #
 
@@ -90,15 +132,17 @@ def find_password():
         data = json.load(data_file)
 
         if website in data:
-            email = data[website]
+            email = data[website]["email"]
+            password = data[website]["password"]
 
             # ---------------------------- UI SETUP ------------------------------- #
 
-
+# create the window of the program
 window = Tk()
 window.title("Password Manager")
 window.config(padx=50, pady=50)
 
+# add the background image and place in the specific spot
 bg_photo = PhotoImage(file="logo.png")
 canvas = Canvas(width=200, height=200)
 canvas.create_image(105, 100, image=bg_photo)
@@ -108,7 +152,6 @@ canvas.grid(column=1, row=0)
 web_label = Label(text="Website:")
 name_label = Label(text="Email/Username:")
 password_label = Label(text="Password:")
-
 
 web_label.grid(column=0, row=1)
 name_label.grid(column=0, row=2)
