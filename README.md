@@ -2,7 +2,12 @@
 
 A GUI local and personal password manager.
 
-++pic of start up page++
+<img width="474" alt="Screen Shot 2022-10-16 at 3 16 26 AM" src="https://user-images.githubusercontent.com/104288486/196024475-a9793edd-ad32-4189-b7ec-19d398d1779c.png"> <img width="474" alt="Screen Shot 2022-10-16 at 3 41 01 AM" src="https://user-images.githubusercontent.com/104288486/196024504-f9db0474-bce1-432f-90ef-6ff681ad8ed6.png">
+
+<img width="474" alt="Screen Shot 2022-10-16 at 3 41 06 AM" src="https://user-images.githubusercontent.com/104288486/196024544-c5447e79-a95c-4a91-9fa1-294ac1e10f15.png"> <img width="474" alt="Screen Shot 2022-10-16 at 3 41 34 AM" src="https://user-images.githubusercontent.com/104288486/196024566-5080b3c0-4cb3-4efb-b0db-2ba801440fb0.png">
+
+<img width="430" alt="Screen Shot 2022-10-16 at 3 42 08 AM" src="https://user-images.githubusercontent.com/104288486/196024568-89d5792f-742e-454d-ae4c-f85e7a5febd3.png"> <img width="474" alt="Screen Shot 2022-10-16 at 3 42 17 AM" src="https://user-images.githubusercontent.com/104288486/196024570-4e05fff0-bc68-407b-9a9d-d71f7afa5a9f.png">
+
 
 The user will type in the website they want to save the information of, change the default email (or leave it), enter or generate a password and hit add. 
 
@@ -17,6 +22,7 @@ What was used: Python with tkinter
 
 **Personal Highlights:**
 Even when I was stuck one things, I was giddy each time a new thing worked. I was showing my husband and telling my dogs (embarrassing but true). I also was really in the groove of doing this myself. Yes I was still googling and looking up things but it was when I was getting to points I had never done before that I was determined to add or when I didn't get the error that I didn't expect. I was getting new errors and not the ones I was before. It felt like growth.
+
 
 **Struggles in the process:**
 I think my biggest struggles was not getting stuck sitting at my computer starting at a screen in the middle of the night when I should really just walk away and take a break, lol. I wanted to push through and find the answer but every time it got me no where. When I would walk away and come back later the problem always seemed smaller or more manageable.
