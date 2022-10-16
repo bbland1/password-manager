@@ -1,4 +1,4 @@
-from tkinter import END, BooleanVar, Button, Canvas, Checkbutton, Entry, Label, Tk, PhotoImage, messagebox
+from tkinter import END, BooleanVar, Button, Canvas, Checkbutton, Entry, Label, Tk, PhotoImage, messagebox, simpledialog
 from random import choice, randint, shuffle
 import pyperclip
 import json
@@ -61,8 +61,8 @@ def save_info():
         ]
     }
 
-    # 
-    if website.strip() == "" or password == " ":
+    # strip the entries of whitespace and check if they are empty strings to make sure values are actually added
+    if website.strip() == "" or password.strip() == "":
         messagebox.showinfo(title="Empty Field", message="Whoops!",
                             detail="Don't leave any fields empty!")
     else:
@@ -88,7 +88,7 @@ def save_info():
                 if website in current_data:
                     # check if within the website found to see if the email used is already stored in the list stored info
                     if not any(emails["email"] == name for emails in current_data[website]):
-                        # if the email isn't found at all the current data is appended and added to the list for the emails 
+                        # if the email isn't found at all the current data is appended and added to the list for the emails
                         current_data[website].append(
                             {"email": data[website][0]["email"], "password": data[website][0]["password"]})
                         data_file.seek(0)
@@ -96,7 +96,7 @@ def save_info():
                     else:
                         # if the email is found in the list of already saved items of the website the popup message will show to confirm overwrite or cancel to stop
                         overwrite = messagebox.askyesno(
-                            title="Overwrite", message=f"Info was already saved for {website} and {name}", detail=f"Would you like to update it?\n Yes: overwrite the current password\n No: cancel the save and clear the inputs to try again")
+                            title="Overwrite", message=f"Info was already saved for {website} and {name}", detail=f"Would you like to update it?\n\nYes: overwrite the current password\n\nNo: cancel the save and clear the inputs to try again", parent=window)
 
                         if overwrite == True:
                             # find where in the list of info for that website the data is stored
@@ -126,16 +126,52 @@ def save_info():
 
 
 def find_password():
+    # get the website input for the search
     website = web_entry.get().capitalize()
 
-    with open("data.json") as data_file:
-        data = json.load(data_file)
-
+    try:
+        # try to open the data file where is should be
+        with open("data.json") as data_file:
+            data = json.load(data_file)
+    except FileNotFoundError:
+        # if the file hasn't been made yet this pop up will show, it should only show because passwords have never been saved
+        messagebox.showinfo(title="Search Issue",
+                            message="No data file found!", parent=window)
+    else:
+        # check if the website being searched for is in the file
         if website in data:
-            email = data[website]["email"]
-            password = data[website]["password"]
+            # For when more than one password/email has been saved
+            if len(data[website]) > 1:
+                # give the list of saved info index values and put those into a list
+                find_web_info = [index for (
+                    index, item) in enumerate(data[website])]
 
-            # ---------------------------- UI SETUP ------------------------------- #
+                # use the index list from before to create a list with a numerical value to be selected
+                found_info = ["(" + str(value + 1) + ")" + " " + data[website][value]["email"] for value in find_web_info]
+
+                # creating a string list to put in a message box
+                found_info_string = "\n".join(found_info)
+
+                # a message box looking for number input from user to select which email to get a password for
+                answer = simpledialog.askinteger(title="Multiple Emails Found", prompt=f"Select which {website} email to get the password:\n\n{found_info_string}\n", parent=window)
+
+                # handles if the user cancels the prompt because it will return none and subtraction can't be done on none
+                if answer is not None:
+                    answer_value = answer - 1
+                
+                    # show the selected email and password
+                    messagebox.showinfo(title="Found Info", message=f"{website}", detail=f"Email: {data[website][answer_value]['email']}\nPassword: {data[website][answer_value]['password']}", parent=window)
+            else:
+                # if the site has only one email/password saved to it at this point
+                messagebox.showinfo(
+                    title="Found Info", message=f"{website}", detail=f"Email: {data[website][0]['email']}\nPassword: {data[website][0]['password']}", parent=window)
+        else:
+            # when the site doesn't have anything saved for it
+            messagebox.showinfo(title="Search Issue",
+                                message=f"No passwords for {website} found.", parent=window)
+
+# ---------------------------- UI SETUP ------------------------------- #
+
 
 # create the window of the program
 window = Tk()
