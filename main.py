@@ -64,7 +64,7 @@ def save_info():
     # strip the entries of whitespace and check if they are empty strings to make sure values are actually added
     if website.strip() == "" or password.strip() == "":
         messagebox.showinfo(title="Empty Field", message="Whoops!",
-                            detail="Don't leave any fields empty!")
+                            detail="Don't leave any fields empty!", parent=window)
     else:
         try:
             # try to open the json file as read and load
@@ -160,9 +160,11 @@ def find_password():
                     answer_value = answer - 1
                 
                     # show the selected email and password
+                    pyperclip.copy(data[website][answer_value]['password'])
                     messagebox.showinfo(title="Found Info", message=f"{website}", detail=f"Email: {data[website][answer_value]['email']}\nPassword: {data[website][answer_value]['password']}", parent=window)
             else:
                 # if the site has only one email/password saved to it at this point
+                pyperclip.copy(data[website][0]['password'])
                 messagebox.showinfo(
                     title="Found Info", message=f"{website}", detail=f"Email: {data[website][0]['email']}\nPassword: {data[website][0]['password']}", parent=window)
         else:
