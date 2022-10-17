@@ -20,7 +20,7 @@ To use the program the repo can be forked and then ran with `python main.py`
 
 What was used: Python with tkinter
 
-**Possible future things:** I'd like to add encryption that uses a password to access the program so that it can be better protected and the info is encrypted in the files if anyone gets in.
+**Things that could be added:** This basically stores the passwords of any website, the next step would be to encrypt the data behind one password on the local computer so that the user has some extra security but also they would have to keep that one key protected. 
 
 **Personal Highlights:**
 Even when I was stuck one things, I was giddy each time a new thing worked. I was showing my husband and telling my dogs (embarrassing but true). I also was really in the groove of doing this myself. Yes I was still googling and looking up things but it was when I was getting to points I had never done before that I was determined to add or when I didn't get the error that I didn't expect. I was getting new errors and not the ones I was before. It felt like growth.
